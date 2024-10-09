@@ -6,3 +6,8 @@ Bellman can handle negative weights but Dijkstra algo can't.
 Bellman visits a vertex more than once but Dijkstra algo only once.
 
 So as number of tickers increases, Bellman ford would take a long time, so if input is large you could choose one algorithm that decreases the time spent calculating and return a result factor (i.e. service deprecation), whereas for smaller inputs maybe you could improve QoS and use your performant algorithm.
+
+Algorithms used:
+
+https://doc.rust-lang.org/std/collections/struct.HashMap.html#method.retain
+OLog(Capacity)

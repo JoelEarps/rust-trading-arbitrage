@@ -29,9 +29,10 @@ Assumptions:
 
 1. The rates for conversions between currencies/ cryptos can be removed i.e. BORG-BORG - this way we do not build a map with replicated nodes.
 2. No costs per trade.
+3. Cryptos are not base currencies?
 
 ## Thoughts on future improvements
 
 Live Updates, multi threaded
 Integration Tests - provide configurable API call address
-Configurable
+Configurable algorithm to be used based on number of base currencies and coins? i.e. one that doesn't search through every just through the first positive e.g. Djikstras algorithm, searches for best

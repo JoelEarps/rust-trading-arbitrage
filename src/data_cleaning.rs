@@ -1,8 +1,11 @@
 use std::collections::HashMap;
+
+use crate::bellman_ford::GraphEdge;
 // Data will be consistent here, always of length two and therefore we can do something a bit more hard coded
-pub(crate) fn remove_duplicate_tickers(raw_rates: &mut HashMap<String, String>) {
+pub(crate) fn remove_duplicate_tickers(raw_rates: &mut HashMap<String, String>) -> Vec<GraphEdge> {
     println!("Removing duplicate tickers to ensure clean node map");
-    raw_rates.retain(|key, _value| {
+    let mut graph_connections = Vec::new();
+    raw_rates.retain(|key, value| {
         let mut split_key: Vec<&str> = key.split("-").collect();
         split_key.dedup();
         println!("{:?}", &split_key.len());
@@ -12,6 +15,7 @@ pub(crate) fn remove_duplicate_tickers(raw_rates: &mut HashMap<String, String>) 
                 }
             2 => {
                 println!("Valid pairing found");
+                graph_connections.push(GraphEdge{ start_node: split_key[0].to_string(), end_node: split_key[1].to_string(), conversion_rate: value.parse::<f64>().expect("Hahahah unlucky") });
                 true
             }
             _ => {
@@ -19,7 +23,9 @@ pub(crate) fn remove_duplicate_tickers(raw_rates: &mut HashMap<String, String>) 
                 false
             }
         }
+    
     });
+    graph_connections
 }
 
 #[cfg(test)]
@@ -45,8 +51,28 @@ mod tests{
         exchange_rates.insert("BORG-EUR".to_string(), "6.53505020".to_string());
         exchange_rates.insert("DAI-BORG".to_string(), "0.16276449".to_string());
         exchange_rates.insert("DAI-DAI".to_string(), "1.00000000".to_string());
+
+        let mut expected_graph_edges = vec![
+        GraphEdge { start_node: "BORG".to_string(), end_node: "DAI".to_string(), conversion_rate: 6.10395983 },
+        GraphEdge { start_node: "EUR".to_string(), end_node: "BTC".to_string(), conversion_rate: 57157.97132034 },
+        GraphEdge { start_node: "EUR".to_string(), end_node: "BORG".to_string(), conversion_rate: 0.14846482 },
+        GraphEdge { start_node: "BORG".to_string(), end_node: "BTC".to_string(), conversion_rate: 370331.49347896 },
+        GraphEdge { start_node: "DAI".to_string(), end_node: "BORG".to_string(), conversion_rate: 0.16276449 },
+        GraphEdge { start_node: "DAI".to_string(), end_node: "BTC".to_string(), conversion_rate: 61194.73626107 },
+        GraphEdge { start_node: "BTC".to_string(), end_node: "DAI".to_string(), conversion_rate: 1.586e-5 },
+        GraphEdge { start_node: "DAI".to_string(), end_node: "EUR".to_string(), conversion_rate: 1.10578631 },
+        GraphEdge { start_node: "BORG".to_string(), end_node: "EUR".to_string(), conversion_rate: 6.5350502 },
+        GraphEdge { start_node: "BTC".to_string(), end_node: "BORG".to_string(), conversion_rate: 2.69e-6 },
+        GraphEdge { start_node: "EUR".to_string(), end_node: "DAI".to_string(), conversion_rate: 0.89846283 },
+        GraphEdge { start_node: "BTC".to_string(), end_node: "EUR".to_string(), conversion_rate: 1.739e-5 },
+        ];
+
         assert_eq!(exchange_rates.len(), 16);
-        remove_duplicate_tickers(&mut exchange_rates);
+        let mut test_vector_return = remove_duplicate_tickers(&mut exchange_rates);
+        test_vector_return.sort_by(|graph_edge_1, graph_edge_2| graph_edge_1.start_node.cmp(&graph_edge_2.start_node));
+        expected_graph_edges.sort_by(|graph_edge_1, graph_edge_2| graph_edge_1.start_node.cmp(&graph_edge_2.start_node));
+        assert_eq!(test_vector_return.len(), expected_graph_edges.len());
+        assert!(test_vector_return.iter().all(|v| expected_graph_edges.contains(v)));
         assert_eq!(exchange_rates.len(), 12);
     }
     #[test]
@@ -66,8 +92,28 @@ mod tests{
         exchange_rates.insert("BTC-DAI".to_string(), "0.00001586".to_string());
         exchange_rates.insert("BORG-EUR".to_string(), "6.53505020".to_string());
         exchange_rates.insert("DAI-BORG".to_string(), "0.16276449".to_string());
+
+        let mut expected_graph_edges = vec![
+        GraphEdge { start_node: "BORG".to_string(), end_node: "DAI".to_string(), conversion_rate: 6.10395983 },
+        GraphEdge { start_node: "EUR".to_string(), end_node: "BTC".to_string(), conversion_rate: 57157.97132034 },
+        GraphEdge { start_node: "EUR".to_string(), end_node: "BORG".to_string(), conversion_rate: 0.14846482 },
+        GraphEdge { start_node: "BORG".to_string(), end_node: "BTC".to_string(), conversion_rate: 370331.49347896 },
+        GraphEdge { start_node: "DAI".to_string(), end_node: "BORG".to_string(), conversion_rate: 0.16276449 },
+        GraphEdge { start_node: "DAI".to_string(), end_node: "BTC".to_string(), conversion_rate: 61194.73626107 },
+        GraphEdge { start_node: "BTC".to_string(), end_node: "DAI".to_string(), conversion_rate: 1.586e-5 },
+        GraphEdge { start_node: "DAI".to_string(), end_node: "EUR".to_string(), conversion_rate: 1.10578631 },
+        GraphEdge { start_node: "BORG".to_string(), end_node: "EUR".to_string(), conversion_rate: 6.5350502 },
+        GraphEdge { start_node: "BTC".to_string(), end_node: "BORG".to_string(), conversion_rate: 2.69e-6 },
+        GraphEdge { start_node: "EUR".to_string(), end_node: "DAI".to_string(), conversion_rate: 0.89846283 },
+        GraphEdge { start_node: "BTC".to_string(), end_node: "EUR".to_string(), conversion_rate: 1.739e-5 },
+        ];
+
         assert_eq!(exchange_rates.len(), 12);
-        remove_duplicate_tickers(&mut exchange_rates);
+        let mut test_vector_return = remove_duplicate_tickers(&mut exchange_rates);
+        test_vector_return.sort_by(|graph_edge_1, graph_edge_2| graph_edge_1.start_node.cmp(&graph_edge_2.start_node));
+        expected_graph_edges.sort_by(|graph_edge_1, graph_edge_2| graph_edge_1.start_node.cmp(&graph_edge_2.start_node));
+        assert_eq!(test_vector_return.len(), expected_graph_edges.len());
+        assert!(test_vector_return.iter().all(|v| expected_graph_edges.contains(v)));
         assert_eq!(exchange_rates.len(), 12);
     }
     #[test]
@@ -78,8 +124,10 @@ mod tests{
         exchange_rates.insert("BORG-BORG".to_string(), "1.00000000".to_string());
         exchange_rates.insert("EUR-EUR".to_string(), "1.00000000".to_string());
         exchange_rates.insert("DAI-DAI".to_string(), "1.00000000".to_string());
+
         assert_eq!(exchange_rates.len(), 4);
-        remove_duplicate_tickers(&mut exchange_rates);
+        let test_vector_return = remove_duplicate_tickers(&mut exchange_rates);
+        assert_eq!(test_vector_return.len(), 0);
         assert_eq!(exchange_rates.len(), 0);
     }
     #[test]
@@ -91,7 +139,8 @@ mod tests{
         exchange_rates.insert("Test3".to_string(), "370331.49347896".to_string());
         exchange_rates.insert("Test4".to_string(), "370331.49347896".to_string());
         assert_eq!(exchange_rates.len(), 4);
-        remove_duplicate_tickers(&mut exchange_rates);
+        let test_vector_return = remove_duplicate_tickers(&mut exchange_rates);
+        assert_eq!(test_vector_return.len(), 0);
         assert_eq!(exchange_rates.len(), 0);
     }
 }

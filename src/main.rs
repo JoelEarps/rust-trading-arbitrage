@@ -2,6 +2,8 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use reqwest::{Error, Response};
 mod data_cleaning;
+mod bellman_ford;
+use bellman_ford::BellmanFord;
 use data_cleaning::remove_duplicate_tickers;
 
 #[derive(Deserialize, Debug)]
@@ -20,7 +22,8 @@ async fn fetch_rates() -> Result<RatesResponse, Error> {
 async fn main() -> Result<(), Error> {
     let mut rates_response = fetch_rates().await?;
     println!("{:#?}", rates_response);
-    remove_duplicate_tickers(&mut rates_response.rates);
+    let graph_edges = remove_duplicate_tickers(&mut rates_response.rates);
+    
     Ok(())
 }
 
