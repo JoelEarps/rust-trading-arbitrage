@@ -32,4 +32,5 @@ Assumptions:
 ## Thoughts on future improvements
 
 Live Updates, multi threaded
-Integration Tests - provide configurable API call
+Integration Tests - provide configurable API call address
+Configurable
