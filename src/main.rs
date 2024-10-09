@@ -1,6 +1,8 @@
 use serde::Deserialize;
 use std::collections::HashMap;
 use reqwest::{Error, Response};
+mod data_cleaning;
+use data_cleaning::remove_duplicate_tickers;
 
 #[derive(Deserialize, Debug)]
 struct RatesResponse {
@@ -16,8 +18,9 @@ async fn fetch_rates() -> Result<RatesResponse, Error> {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let rates_response = fetch_rates().await?;
+    let mut rates_response = fetch_rates().await?;
     println!("{:#?}", rates_response);
+    remove_duplicate_tickers(&mut rates_response.rates);
     Ok(())
 }
 

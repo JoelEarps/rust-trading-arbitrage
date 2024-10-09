@@ -28,6 +28,7 @@ Out of scope:
 Assumptions:
 
 1. The rates for conversions between currencies/ cryptos can be removed i.e. BORG-BORG - this way we do not build a map with replicated nodes.
+2. No costs per trade.
 
 ## Thoughts on future improvements
 
