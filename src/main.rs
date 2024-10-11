@@ -26,12 +26,3 @@ async fn main() -> Result<(), Error> {
 
     Ok(())
 }
-
-/*
-Component Breakdown:
-1. Function to make reqwest and parse it
-    - Maybe remove conversions of same currencies?
-2. Struct to create map of nodes and edges
-3. Perform computation
-4. Print output
- */

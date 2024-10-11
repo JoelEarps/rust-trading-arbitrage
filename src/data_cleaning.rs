@@ -34,10 +34,12 @@ pub(crate) fn remove_duplicate_tickers(raw_rates: &mut HashMap<String, String>) 
         }
     
     });
+
     RequiredGraphData {
         graph_edges: graph_connections,
         graph_vertex_total: total_graph_vertex_number
     }
+    
 }
 
 #[cfg(test)]

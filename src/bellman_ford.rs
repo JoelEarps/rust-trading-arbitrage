@@ -43,65 +43,33 @@ impl SearchAllEdgesAlgorithm for EdgeGraph {
     fn search_for_arbitrage(&self) -> () {
         println!("Searching for Arbitrage Opportunities");
 
-        // What is this doing - what is the purpose
-        // Why do we declare infinity
-        // Fill the vector with infinte
-
-        // Start with a weighted graph - Done
-        // Chose a starting vertex - in this case 0 i.e. BORG
         let source_node = 0;
         
-
         // Chose starting vertex and assign all distances to other vertices as 0
         let mut distances = vec![f64::INFINITY; self.total_vertexes];
         // Distance from the source node is 0
         distances[source_node] = 0.0;
-
         let mut predecessor: Vec<usize> = vec![usize::MAX; self.total_vertexes]; 
 
         println!("Source Node: {}", source_node);
         println!("Source node current distance {}", distances[source_node]);
 
-        // Relax edges one at a time from each node (therefore - 1)
-        // Check from source node all know distances
-        // Skip if they are still infinity
-        // Set them as distances to the nodes if you know them
-
-        // Go through the next loop of verticies
-        // Check from that
         for test in 0..self.total_vertexes - 1 {
             println!("Relaxing vertex : {}", test);
             for edge in &self.edges {
-            // Information on the current node being checked
-            // println!("_________________");
-            // println!("Start Node: {}", edge.start_node);
-            // println!("End Node: {}", edge.end_node);
-            // println!("Original Log Value: {}", edge.log_conversion_value);
-            // println!("Current distance to end node: {}", distances[edge.end_node]);
-            // Calculate the distance to nodes if possible
-            // If this is infinity and there is no distance known
-            // new distance = infinity + 0.1234 for example
-            // In the first instance, where we only know the distances available to the source node
-            // new distance = 0 (distance[0]) + 0.123
-            // 
-            // println!("New Calculated distance: {}", new_distance);
             println!("Distance to End Node: {}", distances[edge.end_node]);
             println!("_________________"); 
 
-            // If the distance of the start_node is not infinity and the distance of the start node plus the weight is less than the distance 
-
-            // if (dist[u] != INT_MAX && dist[u] + w < dist[v])
-            //  dist[v] = dist[u] + w;
+            // If the distance of the start_node is not infinity and the distance of the start node plus the weight is less than the distance
             
                 if distances[edge.start_node] != f64::INFINITY && distances[edge.start_node] + edge.log_conversion_value < distances[edge.end_node] {
                     distances[edge.end_node] = distances[edge.start_node] + edge.log_conversion_value;
                     println!("New Edge Node Distance Calculated {}", distances[edge.end_node]);
+                    // pre[j] = i;
                     predecessor[edge.end_node] = edge.start_node;
                 }
             }
         }
-
-        println!("{}", self.edges.len());
 
         // Look for way to print the entire route - we have found that the shortest distance from Node 2 
         for edge in &self.edges {
@@ -110,8 +78,14 @@ impl SearchAllEdgesAlgorithm for EdgeGraph {
                     println!("{} -----> {}   :    {}      : {}   :    {}" , edge.start_node, edge.end_node, distances[edge.start_node], edge.log_conversion_value, distances[edge.end_node]);
             }
         }
+
+        println!("{}", predecessor.len());
+        for vert in predecessor {
+            println!("{}", vert);
+        }
+        println!("No arbitrage opportunity found.");
     }
-    println!("No arbitrage opportunity found.");
+    
 }
 
 
@@ -146,7 +120,6 @@ mod tests{
     ];
 
         let test_bellman = EdgeGraph::new(test2, currency_map.len());
-        
         test_bellman.search_for_arbitrage();
     }
 }
