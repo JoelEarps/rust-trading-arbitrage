@@ -1,16 +1,25 @@
 use std::collections::HashMap;
 
 use crate::bellman_ford::GraphEdge;
+
+pub struct RequiredGraphData{
+    graph_edges: Vec<GraphEdge>,
+    graph_vertex_total: i32
+}
+
 // Data will be consistent here, always of length two and therefore we can do something a bit more hard coded
-pub(crate) fn remove_duplicate_tickers(raw_rates: &mut HashMap<String, String>) -> Vec<GraphEdge> {
+pub(crate) fn remove_duplicate_tickers(raw_rates: &mut HashMap<String, String>) ->  RequiredGraphData {
     println!("Removing duplicate tickers to ensure clean node map");
     let mut graph_connections = Vec::new();
+    let mut total_graph_vertex_number = 0;
     raw_rates.retain(|key, value| {
         let mut split_key: Vec<&str> = key.split("-").collect();
         split_key.dedup();
         println!("{:?}", &split_key.len());
         match split_key.len() {
+            // For now you can use this to count the number of edges, this assumes the data stays uniform
             1 => { println!("Conversions between the same tickers found");
+                    total_graph_vertex_number+=1;
                    false
                 }
             2 => {
@@ -25,7 +34,10 @@ pub(crate) fn remove_duplicate_tickers(raw_rates: &mut HashMap<String, String>) 
         }
     
     });
-    graph_connections
+    RequiredGraphData {
+        graph_edges: graph_connections,
+        graph_vertex_total: total_graph_vertex_number
+    }
 }
 
 #[cfg(test)]
@@ -69,10 +81,11 @@ mod tests{
 
         assert_eq!(exchange_rates.len(), 16);
         let mut test_vector_return = remove_duplicate_tickers(&mut exchange_rates);
-        test_vector_return.sort_by(|graph_edge_1, graph_edge_2| graph_edge_1.start_node.cmp(&graph_edge_2.start_node));
+        assert_eq!(test_vector_return.graph_vertex_total, 4);
+        test_vector_return.graph_edges.sort_by(|graph_edge_1, graph_edge_2| graph_edge_1.start_node.cmp(&graph_edge_2.start_node));
         expected_graph_edges.sort_by(|graph_edge_1, graph_edge_2| graph_edge_1.start_node.cmp(&graph_edge_2.start_node));
-        assert_eq!(test_vector_return.len(), expected_graph_edges.len());
-        assert!(test_vector_return.iter().all(|v| expected_graph_edges.contains(v)));
+        assert_eq!(test_vector_return.graph_edges.len(), expected_graph_edges.len());
+        assert!(test_vector_return.graph_edges.iter().all(|v| expected_graph_edges.contains(v)));
         assert_eq!(exchange_rates.len(), 12);
     }
     #[test]
@@ -110,10 +123,11 @@ mod tests{
 
         assert_eq!(exchange_rates.len(), 12);
         let mut test_vector_return = remove_duplicate_tickers(&mut exchange_rates);
-        test_vector_return.sort_by(|graph_edge_1, graph_edge_2| graph_edge_1.start_node.cmp(&graph_edge_2.start_node));
+        assert_eq!(test_vector_return.graph_vertex_total, 0);
+        test_vector_return.graph_edges.sort_by(|graph_edge_1, graph_edge_2| graph_edge_1.start_node.cmp(&graph_edge_2.start_node));
         expected_graph_edges.sort_by(|graph_edge_1, graph_edge_2| graph_edge_1.start_node.cmp(&graph_edge_2.start_node));
-        assert_eq!(test_vector_return.len(), expected_graph_edges.len());
-        assert!(test_vector_return.iter().all(|v| expected_graph_edges.contains(v)));
+        assert_eq!(test_vector_return.graph_edges.len(), expected_graph_edges.len());
+        assert!(test_vector_return.graph_edges.iter().all(|v| expected_graph_edges.contains(v)));
         assert_eq!(exchange_rates.len(), 12);
     }
     #[test]
@@ -127,7 +141,8 @@ mod tests{
 
         assert_eq!(exchange_rates.len(), 4);
         let test_vector_return = remove_duplicate_tickers(&mut exchange_rates);
-        assert_eq!(test_vector_return.len(), 0);
+        assert_eq!(test_vector_return.graph_vertex_total, 4);
+        assert_eq!(test_vector_return.graph_edges.len(), 0);
         assert_eq!(exchange_rates.len(), 0);
     }
     #[test]
@@ -140,7 +155,9 @@ mod tests{
         exchange_rates.insert("Test4".to_string(), "370331.49347896".to_string());
         assert_eq!(exchange_rates.len(), 4);
         let test_vector_return = remove_duplicate_tickers(&mut exchange_rates);
-        assert_eq!(test_vector_return.len(), 0);
+        // Temp solution for now, for random data you will need to have a custom error here, or handle based on the return from the function
+        assert_eq!(test_vector_return.graph_vertex_total, 4);
+        assert_eq!(test_vector_return.graph_edges.len(), 0);
         assert_eq!(exchange_rates.len(), 0);
     }
 }

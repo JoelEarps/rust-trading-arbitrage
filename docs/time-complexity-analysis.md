@@ -11,3 +11,5 @@ Algorithms used:
 
 https://doc.rust-lang.org/std/collections/struct.HashMap.html#method.retain
 OLog(Capacity)
+
+Time Complexity for Bellman Ford is O(V\*E) - where V is the number of Vertexes and E is the number of Edges

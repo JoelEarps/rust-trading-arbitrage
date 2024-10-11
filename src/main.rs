@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use reqwest::{Error, Response};
 mod data_cleaning;
 mod bellman_ford;
-use bellman_ford::BellmanFord;
+use bellman_ford::EdgeGraph;
 use data_cleaning::remove_duplicate_tickers;
 
 #[derive(Deserialize, Debug)]
@@ -23,7 +23,7 @@ async fn main() -> Result<(), Error> {
     let mut rates_response = fetch_rates().await?;
     println!("{:#?}", rates_response);
     let graph_edges = remove_duplicate_tickers(&mut rates_response.rates);
-    
+
     Ok(())
 }
 
