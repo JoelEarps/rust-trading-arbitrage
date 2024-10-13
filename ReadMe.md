@@ -1,13 +1,3 @@
-# Phase 1: As per Spec
-
-WHat is the computational logic/ algorithm needed here?
-profitable arbitrage opportunities to capitalize on.
-Sometimes these new currency pairs drift in a way that creates an arbitrage path where you can convert coins through a certain sequence to return a profit in your base currency. This is referred to as an arbitrage loop.
-
-Moore - Bellman Ford
-Shortest Route
-Djkistra - will not work as cannot handle none negative
-
 # Requirements
 
 ## Functional
@@ -29,10 +19,15 @@ Assumptions:
 
 1. The rates for conversions between currencies/ cryptos can be removed i.e. BORG-BORG - this way we do not build a map with replicated nodes.
 2. No costs per trade.
-3. Cryptos are not base currencies?
 
-## Thoughts on future improvements
+# Build
 
-Live Updates, multi threaded
-Integration Tests - provide configurable API call address
-Configurable algorithm to be used based on number of base currencies and coins? i.e. one that doesn't search through every just through the first positive e.g. Djikstras algorithm, searches for best
+`cargo build`
+
+# Test
+
+`cargo test`
+
+# Run
+
+`cargo run`
