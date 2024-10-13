@@ -1,10 +1,11 @@
+use log::info;
 use serde::Deserialize;
 use std::collections::HashMap;
 use reqwest::{Error, Response};
-mod data_preprocessing;
+mod data_pre_processing;
 mod graph_alogrithms;
 use graph_alogrithms::graph_algorithm_handler::{Graph, SearchAllEdgesAlgorithm};
-use data_preprocessing::preprocess_request_data;
+use data_pre_processing::pre_process_request_data;
 
 #[derive(Deserialize, Debug)]
 struct RatesResponse {
@@ -20,9 +21,11 @@ async fn fetch_rates() -> Result<RatesResponse, Error> {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    env_logger::init();
+    info!("Staring arbitrage application");
     let mut rates_response = fetch_rates().await?;
-    println!("{:#?}", rates_response);
-    let graph_data = preprocess_request_data(&mut rates_response.rates);
+    info!("Successfully pulled rates, {:#?}", rates_response);
+    let graph_data = pre_process_request_data(&mut rates_response.rates);
     let bellman_ford_graph = Graph::new(graph_data.graph_edges, graph_data.graph_vertex_total);
     bellman_ford_graph.search_for_arbitrage();
     Ok(())

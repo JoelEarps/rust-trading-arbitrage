@@ -1,33 +1,34 @@
 use std::collections::HashMap;
 use crate::graph_alogrithms::graph_algorithm_handler::{NoneIndexedGraphEdge, IndexedGraphEdge};
+use log::{info, trace, warn };
 
 pub struct RequiredGraphData {
     pub graph_edges: Vec<IndexedGraphEdge>,
     pub graph_vertex_total: usize
 }
 
-pub(crate) fn preprocess_request_data(raw_rates: &mut HashMap<String, String>) ->  RequiredGraphData {
-    println!("Removing duplicate tickers to ensure clean node map");
+pub(crate) fn pre_process_request_data(raw_rates: &mut HashMap<String, String>) ->  RequiredGraphData {
+    info!("Removing duplicate tickers to ensure clean node map");
     let mut none_indexed_graph_edges = Vec::new();
     let mut currency_index_store: HashMap<String, usize> = HashMap::new();
     let mut total_graph_vertex_number = 0;
     raw_rates.retain(|key, value| {
         let mut split_key: Vec<&str> = key.split("-").collect();
         split_key.dedup();
-        println!("{:?}", &split_key.len());
         match split_key.len() {
-            1 => { println!("Conversions between the same tickers found");
+            1 => { 
+                    warn!("Conversions between the same tickers found");
                     currency_index_store.insert(split_key[0].to_owned(), total_graph_vertex_number);
                     total_graph_vertex_number+=1;
                    false
                 }
             2 => {
-                println!("Valid pairing found");
+                trace!("Valid pairing found");
                 none_indexed_graph_edges.push(NoneIndexedGraphEdge{ start_node: split_key[0].to_string(), end_node: split_key[1].to_string(), conversion_rate: value.parse::<f64>().expect("Hahahah unlucky") });
                 true
             }
             _ => {
-                println!("Invalid input");
+                warn!("Invalid input");
                 false
             }
         }
@@ -79,7 +80,7 @@ mod tests{
         exchange_rates.insert("DAI-DAI".to_string(), "1.00000000".to_string());
 
         assert_eq!(exchange_rates.len(), 16);
-        let test_vector_return = preprocess_request_data(&mut exchange_rates);
+        let test_vector_return = pre_process_request_data(&mut exchange_rates);
         assert_eq!(test_vector_return.graph_vertex_total, 4);
         assert_eq!(exchange_rates.len(), 12);
 
@@ -103,7 +104,7 @@ mod tests{
         exchange_rates.insert("DAI-BORG".to_string(), "0.16276449".to_string());
 
         assert_eq!(exchange_rates.len(), 12);
-        let test_vector_return = preprocess_request_data(&mut exchange_rates);
+        let test_vector_return = pre_process_request_data(&mut exchange_rates);
         assert_eq!(test_vector_return.graph_vertex_total, 0);
         assert_eq!(exchange_rates.len(), 12);
     }
@@ -118,7 +119,7 @@ mod tests{
         exchange_rates.insert("DAI-DAI".to_string(), "1.00000000".to_string());
 
         assert_eq!(exchange_rates.len(), 4);
-        let test_vector_return = preprocess_request_data(&mut exchange_rates);
+        let test_vector_return = pre_process_request_data(&mut exchange_rates);
         assert_eq!(test_vector_return.graph_vertex_total, 4);
         assert_eq!(test_vector_return.graph_edges.len(), 0);
         assert_eq!(exchange_rates.len(), 0);
@@ -133,7 +134,7 @@ mod tests{
         exchange_rates.insert("Test3".to_string(), "370331.49347896".to_string());
         exchange_rates.insert("Test4".to_string(), "370331.49347896".to_string());
         assert_eq!(exchange_rates.len(), 4);
-        let test_vector_return = preprocess_request_data(&mut exchange_rates);
+        let test_vector_return = pre_process_request_data(&mut exchange_rates);
         assert_eq!(test_vector_return.graph_vertex_total, 4);
         assert_eq!(test_vector_return.graph_edges.len(), 0);
         assert_eq!(exchange_rates.len(), 0);

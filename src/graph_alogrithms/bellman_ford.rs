@@ -1,49 +1,34 @@
+use log::{info, trace};
+
 use crate::graph_alogrithms::graph_algorithm_handler::{Graph, SearchAllEdgesAlgorithm, IndexedGraphEdge};
 
 impl SearchAllEdgesAlgorithm for Graph {
     fn search_for_arbitrage(&self) -> () {
-        println!("Searching for Arbitrage Opportunities");
-
+        info!("Searching for Arbitrage Opportunities");
         let source_node = 0;
-        
-        // Chose starting vertex and assign all distances to other vertices as 0
         let mut distances = vec![f64::INFINITY; self.total_vertexes];
-        // Distance from the source node is 0
         distances[source_node] = 0.0;
         let mut predecessor: Vec<usize> = vec![usize::MAX; self.total_vertexes]; 
 
-        println!("Source Node: {}", source_node);
-        println!("Source node current distance {}", distances[source_node]);
-
-        for test in 0..self.total_vertexes - 1 {
-            println!("Relaxing vertex : {}", test);
+        for _ in 0..self.total_vertexes - 1 {
             for edge in &self.edges {
-            println!("Distance to End Node: {}", distances[edge.end_node]);
-            println!("_________________"); 
-
-            // If the distance of the start_node is not infinity and the distance of the start node plus the weight is less than the distance
-            
+            trace!("Distance to End Node: {}", distances[edge.end_node]);
                 if distances[edge.start_node] != f64::INFINITY && distances[edge.start_node] + edge.log_conversion_value < distances[edge.end_node] {
                     distances[edge.end_node] = distances[edge.start_node] + edge.log_conversion_value;
-                    println!("New Edge Node Distance Calculated {}", distances[edge.end_node]);
+                    trace!("New Edge Node Distance Calculated {}", distances[edge.end_node]);
                     predecessor[edge.end_node] = edge.start_node;
                 }
             }
         }
 
-        // Look for way to print the entire route - we have found that the shortest distance from Node 2 
         for edge in &self.edges {
             if distances[edge.start_node] != f64::INFINITY && distances[edge.start_node] + edge.log_conversion_value < distances[edge.end_node] {
-                    println!("Negative Weight cycle detected - arbitrage value present");
-                    println!("{} -----> {}   :    {}      : {}   :    {}" , edge.start_node, edge.end_node, distances[edge.start_node], edge.log_conversion_value, distances[edge.end_node]);
-            }
+            } 
         }
 
-        println!("{}", predecessor.len());
         for vert in predecessor {
             println!("{}", vert);
         }
-        println!("No arbitrage opportunity found.");
     }
     
 }

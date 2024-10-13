@@ -1,3 +1,5 @@
+use log::info;
+
 
 #[derive(Clone, Copy, Debug)]
 pub struct IndexedGraphEdge {
@@ -20,7 +22,7 @@ pub struct Graph {
 
 impl Graph {
     pub fn new(graph_edges: Vec<IndexedGraphEdge>, calculated_total_vertexes: usize) -> Self {
-        println!("Creating new nodes for edges");
+        info!("Creating new nodes for edges");
         Self {
             edges: graph_edges,
             total_vertexes: calculated_total_vertexes
