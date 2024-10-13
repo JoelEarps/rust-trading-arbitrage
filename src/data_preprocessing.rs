@@ -6,7 +6,6 @@ pub struct RequiredGraphData {
     pub graph_vertex_total: usize
 }
 
-// Data will be consistent here, always of length two and therefore we can do something a bit more hard coded
 pub(crate) fn preprocess_request_data(raw_rates: &mut HashMap<String, String>) ->  RequiredGraphData {
     println!("Removing duplicate tickers to ensure clean node map");
     let mut none_indexed_graph_edges = Vec::new();

@@ -1,10 +1,10 @@
 use serde::Deserialize;
 use std::collections::HashMap;
 use reqwest::{Error, Response};
-mod data_cleaning;
-mod bellman_ford;
-use bellman_ford::EdgeGraph;
-use data_cleaning::remove_duplicate_tickers;
+mod data_preprocessing;
+mod graph_alogrithms;
+use graph_alogrithms::graph_algorithm_handler::{Graph, SearchAllEdgesAlgorithm};
+use data_preprocessing::preprocess_request_data;
 
 #[derive(Deserialize, Debug)]
 struct RatesResponse {
@@ -22,7 +22,8 @@ async fn fetch_rates() -> Result<RatesResponse, Error> {
 async fn main() -> Result<(), Error> {
     let mut rates_response = fetch_rates().await?;
     println!("{:#?}", rates_response);
-    let graph_edges = remove_duplicate_tickers(&mut rates_response.rates);
-
+    let graph_data = preprocess_request_data(&mut rates_response.rates);
+    let bellman_ford_graph = Graph::new(graph_data.graph_edges, graph_data.graph_vertex_total);
+    bellman_ford_graph.search_for_arbitrage();
     Ok(())
 }
