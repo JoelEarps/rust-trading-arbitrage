@@ -1,37 +1,29 @@
 ## File structure
 
-Files are essentially mods, following the S in SOLID I separated out the key functionality into files and therefore software components. I din't think there was a need for a folder structure as we would have one file per folder which would just over complicate. In the future if logic was able to be grouped into sub categories
+Files are mods, following the S in SOLID I separated out the key functionality into files and therefore software components. The reason for a folder structure for graph algorithms is so that the arbitrage algorithm can be implemented depending on the algorithm you would want to use e.g. if the number of nodes becomes higher you choose to provide a degradation of service.
 
-## Potential Algorithms Reviewed
+## Algorithm Choice
 
-1. Bellman Ford - Common in
-2. Floyd Warshall - Negative Edges
-3. Djikstra - Negative Edges
-4. DFS -
+Upon reading the question and challenges presented, it became apparent to me this is a shortest/ weighted route problem (something I looked at before during my PhD for an investigation). Initially there were a few algorithms that came to mind.
 
-## Reasons for using Vecs
+1. Djiktra.
+2. Bellman Ford.
+3. DFS - Depth First Search.
 
-Options considered:
+Upon review there was only one clear option for use in this context - Bellman Ford. Bellman can handle negative weights, whereas the others cannot, and this will be the core concept behind detecting arbitrage loops (docs/arbitrage-loop-algorithm-explained.md).
 
-1. Binary Tree -
-2. Hashmap -
-3. Vectors of custom structs
+# Data pre processing functionality
 
-// Actually
-The algorithm - you need to check for every possible start point, or allow the user to input them
-Go through each one, complete a complete loop all the way back to the start, if at any point the value is higher than the original start price, you save it as an increase, when you get to the end, return the max value and the trades you can do?
+There were two potential solutions when looking to implement this algorithm - either use an enum and define all base currencies with an index or use some preprocessing to clean the data set and create usable data from the endpoint. Whilst the enum would have been far easier, this makes the application less scalable as every time a new base currency is added to the endpoint then the application code would also have to be changed. With the current implementation unless the data contract between the endpoint and the arbitrage application changes
 
-# Would enum choice be beneficial here
-
-Using Enums to define all currencies and given them an index, seem to have added far too much complexity?
-
-Negatives of this choice vs positives?
+## Review of options.
 
 Positives:
 
-1. Makes code clear
-2. Easier to assign values to the enum and then check
+1. Makes code more clear.
+2. Easier to assign values to the enum and then check.
 
 Negatives:
 
 1. The application cannot scale itself and is none adaptable, the programmer would have to update the enum everytime a new currency would like to be added. This is prone to human error and can be a tedious task.
+2. For real world applications - this would make the codebase huge and increase space complexity.

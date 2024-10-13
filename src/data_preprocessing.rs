@@ -44,7 +44,7 @@ fn create_indexing_for_currencies(none_indexed_graph_edges: Vec<NoneIndexedGraph
             start_node: index_store[&none_indexed_singleton.start_node],
             end_node: index_store[&none_indexed_singleton.end_node],
             conversion_rate: none_indexed_singleton.conversion_rate,
-            log_conversion_value: none_indexed_singleton.conversion_rate.ln()
+            log_conversion_value: -1.0 * none_indexed_singleton.conversion_rate.ln()
     }).collect();
 
     RequiredGraphData {

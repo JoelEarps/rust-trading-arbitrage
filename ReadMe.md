@@ -1,3 +1,8 @@
+# Pre-requisites
+
+1. Cargo and rust toolchain.
+2. Mermaid extension for your chosen IDE.
+
 # Requirements
 
 ## Functional
