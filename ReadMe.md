@@ -35,4 +35,17 @@ Assumptions:
 
 # Run
 
+Running with default log levels (error):
+
 `cargo run`
+
+Running with custom log level:
+
+`RUST_LOG=${DESIRED_LOG_LEVEL} cargo run`
+
+Available log levels (decreasing in verbosity):
+
+1. Trace
+2. Info
+3. Warn
+4. Error
