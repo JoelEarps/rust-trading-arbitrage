@@ -1,5 +1,4 @@
-use log::{info, trace, warn};
-use std::error::Error;
+use log::{info, trace};
 use crate::graph_algorithms::graph_algorithm_handler::{Graph, SearchAllEdgesAlgorithm};
 
 impl SearchAllEdgesAlgorithm for Graph {
@@ -20,15 +19,7 @@ impl SearchAllEdgesAlgorithm for Graph {
                 }
             }
         }
-
-        // What does the distances array mean - add logging to see what gets added where
-        /* The distances array get added to each time a new shorter distances is found when relaxing each vertex and checking and edge
-            Taking the example of distance for vertex 0
-            The distance[0] = shortest distance found to get to 0 from another node  */
-
-
-
-        
+     
         for edge in &self.edges {
             if distances[edge.start_node] != f64::INFINITY && distances[edge.start_node] + edge.log_conversion_value < distances[edge.end_node] {
                 info!("Negative weight cycle detected - arbitrage opportunity detected");
@@ -65,7 +56,6 @@ impl SearchAllEdgesAlgorithm for Graph {
     
 }
 
-// Create a mermaid diagram to show how this all fits together
 #[cfg(test)]
 mod tests{
     use std::collections::HashMap;

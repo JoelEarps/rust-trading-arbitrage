@@ -1,10 +1,10 @@
 use log::info;
 use serde::Deserialize;
 use std::collections::HashMap;
-use reqwest::{Error, Response};
+use reqwest::Error;
 mod data_pre_processing;
 mod graph_algorithms;
-use graph_algorithms::{bellman_ford, graph_algorithm_handler::{Graph, SearchAllEdgesAlgorithm}};
+use graph_algorithms::graph_algorithm_handler::{Graph, SearchAllEdgesAlgorithm};
 use data_pre_processing::pre_process_request_data;
 
 #[derive(Deserialize, Debug)]
