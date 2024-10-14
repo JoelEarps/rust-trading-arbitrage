@@ -17,19 +17,19 @@ pub struct NoneIndexedGraphEdge {
 
 pub struct Graph {
    pub edges: Vec<IndexedGraphEdge>,
-   pub total_vertexes: usize
+   pub total_vertices: usize,
 }
 
 impl Graph {
-    pub fn new(graph_edges: Vec<IndexedGraphEdge>, calculated_total_vertexes: usize) -> Self {
+    pub fn new(graph_edges: Vec<IndexedGraphEdge>, calculated_total_vertices: usize) -> Self {
         info!("Creating new nodes for edges");
         Self {
             edges: graph_edges,
-            total_vertexes: calculated_total_vertexes
+            total_vertices: calculated_total_vertices
         }
-    }
+    }   
 }
 
 pub trait SearchAllEdgesAlgorithm {
-    fn search_for_arbitrage(&self) -> ();
+    fn search_for_arbitrage(&self, start:usize) -> ();
 }

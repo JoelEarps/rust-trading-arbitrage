@@ -1,30 +1,30 @@
 use std::collections::HashMap;
-use crate::graph_alogrithms::graph_algorithm_handler::{NoneIndexedGraphEdge, IndexedGraphEdge};
+use crate::graph_algorithms::graph_algorithm_handler::{NoneIndexedGraphEdge, IndexedGraphEdge};
 use log::{info, trace, warn };
 
 pub struct RequiredGraphData {
     pub graph_edges: Vec<IndexedGraphEdge>,
-    pub graph_vertex_total: usize
+    pub graph_vertices_total: usize,
 }
 
 pub(crate) fn pre_process_request_data(raw_rates: &mut HashMap<String, String>) ->  RequiredGraphData {
     info!("Removing duplicate tickers to ensure clean node map");
     let mut none_indexed_graph_edges = Vec::new();
     let mut currency_index_store: HashMap<String, usize> = HashMap::new();
-    let mut total_graph_vertex_number = 0;
+    let mut total_graph_vertices_number = 0;
     raw_rates.retain(|key, value| {
         let mut split_key: Vec<&str> = key.split("-").collect();
         split_key.dedup();
         match split_key.len() {
             1 => { 
                     warn!("Conversions between the same tickers found");
-                    currency_index_store.insert(split_key[0].to_owned(), total_graph_vertex_number);
-                    total_graph_vertex_number+=1;
+                    currency_index_store.insert(split_key[0].to_owned(), total_graph_vertices_number);
+                    total_graph_vertices_number+=1;
                    false
                 }
             2 => {
                 trace!("Valid pairing found");
-                none_indexed_graph_edges.push(NoneIndexedGraphEdge{ start_node: split_key[0].to_string(), end_node: split_key[1].to_string(), conversion_rate: value.parse::<f64>().expect("Hahahah unlucky") });
+                none_indexed_graph_edges.push(NoneIndexedGraphEdge{ start_node: split_key[0].to_string(), end_node: split_key[1].to_string(), conversion_rate: value.parse::<f64>().expect("Cannot parse conversion rate") });
                 true
             }
             _ => {
@@ -32,9 +32,9 @@ pub(crate) fn pre_process_request_data(raw_rates: &mut HashMap<String, String>) 
                 false
             }
         }
-    
     });
-
+    // add error here for no values in index store and data contract changing!
+    info!("{:?}", currency_index_store);
     create_indexing_for_currencies(none_indexed_graph_edges, currency_index_store)
 }
 
@@ -50,7 +50,7 @@ fn create_indexing_for_currencies(none_indexed_graph_edges: Vec<NoneIndexedGraph
 
     RequiredGraphData {
         graph_edges: indexed_graph_edges,
-        graph_vertex_total: index_store.len()
+        graph_vertices_total: index_store.len(),
     }
 }
 
@@ -81,7 +81,7 @@ mod tests{
 
         assert_eq!(exchange_rates.len(), 16);
         let test_vector_return = pre_process_request_data(&mut exchange_rates);
-        assert_eq!(test_vector_return.graph_vertex_total, 4);
+        assert_eq!(test_vector_return.graph_vertices_total, 4);
         assert_eq!(exchange_rates.len(), 12);
 
     }
@@ -105,12 +105,12 @@ mod tests{
 
         assert_eq!(exchange_rates.len(), 12);
         let test_vector_return = pre_process_request_data(&mut exchange_rates);
-        assert_eq!(test_vector_return.graph_vertex_total, 0);
+        assert_eq!(test_vector_return.graph_vertices_total, 0);
         assert_eq!(exchange_rates.len(), 12);
     }
 
     #[test]
-    // Random data, no duplicates
+    // Random data, no duplicates, this will fail due to assumptions - custom error for this?
     fn test_duplicates_with_all_replica_tickers() {
         let mut exchange_rates: HashMap<String, String> = HashMap::new();
         exchange_rates.insert("BTC-BTC".to_string(), "1.00000000".to_string());
@@ -120,7 +120,7 @@ mod tests{
 
         assert_eq!(exchange_rates.len(), 4);
         let test_vector_return = pre_process_request_data(&mut exchange_rates);
-        assert_eq!(test_vector_return.graph_vertex_total, 4);
+        assert_eq!(test_vector_return.graph_vertices_total, 4);
         assert_eq!(test_vector_return.graph_edges.len(), 0);
         assert_eq!(exchange_rates.len(), 0);
     }
@@ -135,7 +135,7 @@ mod tests{
         exchange_rates.insert("Test4".to_string(), "370331.49347896".to_string());
         assert_eq!(exchange_rates.len(), 4);
         let test_vector_return = pre_process_request_data(&mut exchange_rates);
-        assert_eq!(test_vector_return.graph_vertex_total, 4);
+        assert_eq!(test_vector_return.graph_vertices_total, 4);
         assert_eq!(test_vector_return.graph_edges.len(), 0);
         assert_eq!(exchange_rates.len(), 0);
     }

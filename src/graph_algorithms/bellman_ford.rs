@@ -1,44 +1,75 @@
-use log::{info, trace};
-
-use crate::graph_alogrithms::graph_algorithm_handler::{Graph, SearchAllEdgesAlgorithm, IndexedGraphEdge};
+use log::{info, trace, warn};
+use std::error::Error;
+use crate::graph_algorithms::graph_algorithm_handler::{Graph, SearchAllEdgesAlgorithm};
 
 impl SearchAllEdgesAlgorithm for Graph {
-    fn search_for_arbitrage(&self) -> () {
+    fn search_for_arbitrage(&self, start_vertex: usize) -> () {
         info!("Searching for Arbitrage Opportunities");
-        let source_node = 0;
-        let mut distances = vec![f64::INFINITY; self.total_vertexes];
-        distances[source_node] = 0.0;
-        let mut predecessor: Vec<usize> = vec![usize::MAX; self.total_vertexes]; 
+        let source_vertex = start_vertex;
+        let mut distances = vec![f64::INFINITY; self.total_vertices];
+        distances[source_vertex] = 0.0;
+        let mut previous_vertices: Vec<usize> = vec![usize::MAX; self.total_vertices]; 
 
-        for _ in 0..self.total_vertexes - 1 {
+        for _ in 0..self.total_vertices - 1 {
             for edge in &self.edges {
             trace!("Distance to End Node: {}", distances[edge.end_node]);
                 if distances[edge.start_node] != f64::INFINITY && distances[edge.start_node] + edge.log_conversion_value < distances[edge.end_node] {
                     distances[edge.end_node] = distances[edge.start_node] + edge.log_conversion_value;
                     trace!("New Edge Node Distance Calculated {}", distances[edge.end_node]);
-                    predecessor[edge.end_node] = edge.start_node;
+                    previous_vertices[edge.end_node] = edge.start_node;
                 }
             }
         }
 
+        // What does the distances array mean - add logging to see what gets added where
+        /* The distances array get added to each time a new shorter distances is found when relaxing each vertex and checking and edge
+            Taking the example of distance for vertex 0
+            The distance[0] = shortest distance found to get to 0 from another node  */
+
+
+
+        
         for edge in &self.edges {
             if distances[edge.start_node] != f64::INFINITY && distances[edge.start_node] + edge.log_conversion_value < distances[edge.end_node] {
-            } 
+                info!("Negative weight cycle detected - arbitrage opportunity detected");
+                let mut start = source_vertex;
+                let mut loop_path:Vec<usize> = Vec::new();
+                loop {
+                    loop_path.push(start);
+                    start = previous_vertices[start];
+                    if start == edge.end_node {
+                    trace!("Returned to the start of the chain");
+                    break;
+                    }
+                }
+                if start != source_vertex {
+                    loop_path.push(start);
+                    loop_path.push(source_vertex);
+                } else {
+                    loop_path.push(source_vertex);
+                }
+                
+                for vertex in loop_path {
+                    print!("{} ----> ", vertex);
+                }
+                println!("");
+            }
         }
 
-        for vert in predecessor {
-            println!("{}", vert);
-        }
+       
+        
+
+        
+       
     }
     
 }
-
 
 // Create a mermaid diagram to show how this all fits together
 #[cfg(test)]
 mod tests{
     use std::collections::HashMap;
-
+    use crate::graph_algorithms::graph_algorithm_handler::IndexedGraphEdge;
     use super::*;
     #[test]
     fn test_creation_of_graph() {
@@ -60,9 +91,10 @@ mod tests{
         IndexedGraphEdge { start_node: currency_map["BTC"], end_node: currency_map["BORG"], conversion_rate: 2.69e-6, log_conversion_value: -1.0 *(2.69e-6f64).ln() },
         IndexedGraphEdge { start_node: currency_map["EUR"], end_node: currency_map["DAI"], conversion_rate: 0.89846283, log_conversion_value: -1.0 * (0.89846283f64).ln() },
         IndexedGraphEdge { start_node: currency_map["BTC"], end_node: currency_map["EUR"], conversion_rate: 1.739e-5, log_conversion_value: -1.0 * (1.739e-5f64).ln() },
+        IndexedGraphEdge { start_node: currency_map["BORG"], end_node: currency_map["DAI"], conversion_rate: 1.739e-5, log_conversion_value: -1.0 * (1.739e-5f64).ln() },
     ];
 
         let test_bellman_ford = Graph::new(test_input, currency_map.len());
-        test_bellman_ford.search_for_arbitrage();
+        test_bellman_ford.search_for_arbitrage(0);
     }
 }
