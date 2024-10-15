@@ -1,8 +1,8 @@
 use log::info;
 use reqwest::Error;
-mod data_pre_processing;
+mod data_processing;
 mod graph_algorithms;
-use data_pre_processing::pre_process_request_data;
+use data_processing::data_pre_processing::pre_process_request_data;
 use graph_algorithms::handler::{Graph, SearchAllEdgesAlgorithm};
 mod fetch_rates;
 use fetch_rates::fetch_rates;
