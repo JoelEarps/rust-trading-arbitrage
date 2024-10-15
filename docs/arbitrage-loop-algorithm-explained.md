@@ -22,5 +22,5 @@ The Bellman Ford algorithm can be used to detect negative weight cycles, and the
 flowchart TD
     id1(Pull data from API)--> id2(Pre process data)
     id2 --> id3(Run arbitrage algorithm)
-    id3 --> id4(Pretty Print Route)
+    id3 --> id4(Print Arbitrage Route)
 ```
