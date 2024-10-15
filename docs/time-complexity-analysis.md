@@ -7,4 +7,4 @@ Time complexity would be O(N \* L) - where N is the number of key value pairs pa
 ## Time complexity of the algorithm
 
 Time Complexity for Bellman Ford is O(V\*E) - where V is the number of vertices and E is the number of Edges.
-This is Bellman visits a vertex more than once and relaxes the vertices V-1 times.
+This is Bellman because visits a vertex more than once and relaxes the vertices V-1 times.

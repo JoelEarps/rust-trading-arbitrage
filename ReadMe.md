@@ -43,6 +43,8 @@ Running with custom log level:
 
 `RUST_LOG=${DESIRED_LOG_LEVEL} cargo run`
 
+_Note_: currently the info level prints the loop opportunity.
+
 Available log levels (decreasing in verbosity):
 
 1. Trace

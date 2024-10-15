@@ -51,7 +51,7 @@ The following is a list of features (with examples) for what BORG enables within
 
 ## BORG buyback & Protect and Choose
 
-Protect and Choose - Buy back BORG tokens and see how they should be
+Protect and Choose - Buy back BORG tokens and see how they should be reused/ redistributed.
 Buyback - tokens are brought back and placed back in the buyback pool using a portion of fees that are gained from SwissBorg EARN.
 
 ## The Guardians of the BORG
@@ -60,6 +60,5 @@ Used to create a drive value of the BORG token by rewarding users, increasing sc
 
 # Open Questions
 
-What blockchain is the borg token built upon?
-What are the differences in rewards, governance as you increase the number of tokens? Other than yield rates and lower fees.
+What blockchain is the BORG token built upon?
 Is this link meant to cause a redirect -> https://swissborg.com/buy-borg
