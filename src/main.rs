@@ -1,23 +1,11 @@
 use log::info;
-use serde::Deserialize;
-use std::collections::HashMap;
 use reqwest::Error;
 mod data_pre_processing;
 mod graph_algorithms;
 use graph_algorithms::handler::{Graph, SearchAllEdgesAlgorithm};
 use data_pre_processing::pre_process_request_data;
-
-#[derive(Deserialize, Debug)]
-struct RatesResponse {
-    rates: HashMap<String, String>,
-}
-
-async fn fetch_rates() -> Result<RatesResponse, Error> {
-    let url = "https://api.swissborg.io/v1/challenge/rates";
-    // Custom error here for failing - demonstrate ability to do this?
-    let response = reqwest::get(url).await?.json::<RatesResponse>().await?;
-    Ok(response)
-}
+mod fetch_rates;
+use fetch_rates::fetch_rates;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
