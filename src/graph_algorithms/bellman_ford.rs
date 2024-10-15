@@ -1,5 +1,5 @@
 use log::{info, trace};
-use crate::graph_algorithms::graph_algorithm_handler::{Graph, SearchAllEdgesAlgorithm};
+use crate::graph_algorithms::handler::{Graph, SearchAllEdgesAlgorithm};
 
 impl SearchAllEdgesAlgorithm for Graph {
     fn search_for_arbitrage(&self, start_vertex: usize) -> () {
@@ -41,9 +41,9 @@ impl SearchAllEdgesAlgorithm for Graph {
                 }
                 
                 for vertex in loop_path {
-                    print!("{} ----> ", vertex);
+                    info!("{}", vertex);
                 }
-                println!("");
+                
             }
         }
 
@@ -59,7 +59,7 @@ impl SearchAllEdgesAlgorithm for Graph {
 #[cfg(test)]
 mod tests{
     use std::collections::HashMap;
-    use crate::graph_algorithms::graph_algorithm_handler::IndexedGraphEdge;
+    use crate::graph_algorithms::handler::IndexedGraphEdge;
     use super::*;
     #[test]
     fn test_creation_of_graph() {
