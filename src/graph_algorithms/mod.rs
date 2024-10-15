@@ -1,2 +1,2 @@
 pub mod bellman_ford;
-pub mod graph_algorithm_handler;
+pub mod handler;

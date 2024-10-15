@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use crate::graph_algorithms::graph_algorithm_handler::{NoneIndexedGraphEdge, IndexedGraphEdge};
+use crate::graph_algorithms::handler::{NoneIndexedGraphEdge, IndexedGraphEdge};
 use log::{info, trace, warn };
 
 pub struct RequiredGraphData {
@@ -87,7 +87,8 @@ mod tests{
     }
 
     #[test]
-    // Random Test data - all the same should be zero
+    #[should_panic(expected = "no entry found for key")]
+    // Random Test data - all the same should be zero and should panic due to no keys in hash maps
     fn test_duplicates_with_no_replica_data() {
         let mut exchange_rates: HashMap<String, String> = HashMap::new();
         exchange_rates.insert("BORG-BTC".to_string(), "370331.49347896".to_string());

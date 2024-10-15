@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use reqwest::Error;
 mod data_pre_processing;
 mod graph_algorithms;
-use graph_algorithms::graph_algorithm_handler::{Graph, SearchAllEdgesAlgorithm};
+use graph_algorithms::handler::{Graph, SearchAllEdgesAlgorithm};
 use data_pre_processing::pre_process_request_data;
 
 #[derive(Deserialize, Debug)]
