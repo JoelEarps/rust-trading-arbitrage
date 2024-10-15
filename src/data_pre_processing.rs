@@ -1,13 +1,15 @@
+use crate::graph_algorithms::handler::{IndexedGraphEdge, NoneIndexedGraphEdge};
+use log::{info, trace, warn};
 use std::collections::HashMap;
-use crate::graph_algorithms::handler::{NoneIndexedGraphEdge, IndexedGraphEdge};
-use log::{info, trace, warn };
 
 pub struct RequiredGraphData {
     pub graph_edges: Vec<IndexedGraphEdge>,
     pub graph_vertices_total: usize,
 }
 
-pub(crate) fn pre_process_request_data(raw_rates: &mut HashMap<String, String>) ->  RequiredGraphData {
+pub(crate) fn pre_process_request_data(
+    raw_rates: &mut HashMap<String, String>,
+) -> RequiredGraphData {
     info!("Removing duplicate tickers to ensure clean node map");
     let mut none_indexed_graph_edges = Vec::new();
     let mut currency_index_store: HashMap<String, usize> = HashMap::new();
@@ -16,15 +18,19 @@ pub(crate) fn pre_process_request_data(raw_rates: &mut HashMap<String, String>) 
         let mut split_key: Vec<&str> = key.split("-").collect();
         split_key.dedup();
         match split_key.len() {
-            1 => { 
-                    warn!("Conversions between the same tickers found");
-                    currency_index_store.insert(split_key[0].to_owned(), total_graph_vertices_number);
-                    total_graph_vertices_number+=1;
-                   false
-                }
+            1 => {
+                warn!("Conversions between the same tickers found");
+                currency_index_store.insert(split_key[0].to_owned(), total_graph_vertices_number);
+                total_graph_vertices_number += 1;
+                false
+            }
             2 => {
                 trace!("Valid pairing found");
-                none_indexed_graph_edges.push(NoneIndexedGraphEdge{ start_node: split_key[0].to_string(), end_node: split_key[1].to_string(), conversion_rate: value.parse::<f64>().expect("Cannot parse conversion rate") });
+                none_indexed_graph_edges.push(NoneIndexedGraphEdge {
+                    start_node: split_key[0].to_string(),
+                    end_node: split_key[1].to_string(),
+                    conversion_rate: value.parse::<f64>().expect("Cannot parse conversion rate"),
+                });
                 true
             }
             _ => {
@@ -38,15 +44,18 @@ pub(crate) fn pre_process_request_data(raw_rates: &mut HashMap<String, String>) 
     create_indexing_for_currencies(none_indexed_graph_edges, currency_index_store)
 }
 
-fn create_indexing_for_currencies(none_indexed_graph_edges: Vec<NoneIndexedGraphEdge>, index_store: HashMap<String, usize>) -> RequiredGraphData {
-    
-    let indexed_graph_edges = none_indexed_graph_edges.iter().map(|none_indexed_singleton|
-        IndexedGraphEdge {
+fn create_indexing_for_currencies(
+    none_indexed_graph_edges: Vec<NoneIndexedGraphEdge>,
+    index_store: HashMap<String, usize>,
+) -> RequiredGraphData {
+    let indexed_graph_edges = none_indexed_graph_edges
+        .iter()
+        .map(|none_indexed_singleton| IndexedGraphEdge {
             start_node: index_store[&none_indexed_singleton.start_node],
             end_node: index_store[&none_indexed_singleton.end_node],
-            conversion_rate: none_indexed_singleton.conversion_rate,
-            log_conversion_value: -1.0 * none_indexed_singleton.conversion_rate.ln()
-    }).collect();
+            log_conversion_value: -1.0 * none_indexed_singleton.conversion_rate.ln(),
+        })
+        .collect();
 
     RequiredGraphData {
         graph_edges: indexed_graph_edges,
@@ -55,7 +64,7 @@ fn create_indexing_for_currencies(none_indexed_graph_edges: Vec<NoneIndexedGraph
 }
 
 #[cfg(test)]
-mod tests{
+mod tests {
     use super::*;
 
     #[test]
@@ -83,7 +92,6 @@ mod tests{
         let test_vector_return = pre_process_request_data(&mut exchange_rates);
         assert_eq!(test_vector_return.graph_vertices_total, 4);
         assert_eq!(exchange_rates.len(), 12);
-
     }
 
     #[test]

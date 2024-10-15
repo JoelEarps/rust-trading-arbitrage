@@ -1,6 +1,6 @@
+use reqwest::Error;
 use serde::Deserialize;
 use std::collections::HashMap;
-use reqwest::Error;
 
 #[derive(Deserialize, Debug)]
 pub struct RatesResponse {
