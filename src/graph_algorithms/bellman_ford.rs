@@ -136,4 +136,96 @@ mod tests {
         let test_bellman_ford = Graph::new(test_input, currency_map.len());
         test_bellman_ford.search_for_arbitrage(0);
     }
+
+    #[test]
+    fn test_infinite_loop_capabilities() {
+        /* Rates the can cause an infinite loop
+            "BTC-EUR": "0.00001640",
+            "BORG-BORG": "1.00000000",
+            "EUR-EUR": "1.00000000",
+            "DAI-EUR": "1.07431888",
+            "DAI-DAI": "1.00000000",
+            "BORG-DAI": "5.65371840",
+            "BTC-DAI": "0.00001540",
+            "DAI-BORG": "0.17572576",
+            "EUR-BORG": "0.15719603",
+            "BORG-BTC": "370417.72592085",
+            "BORG-EUR": "6.31434472",
+            "EUR-DAI": "0.90310710",
+            "EUR-BTC": "60589.98586103",
+            "DAI-BTC": "64534.77771176",
+            "BTC-BORG": "0.00000262",
+            "BTC-BTC": "1.00000000", */
+            let mut currency_map: HashMap<&str, usize> = HashMap::new();
+        currency_map.insert("BORG", 0);
+        currency_map.insert("DAI", 1);
+        currency_map.insert("EUR", 2);
+        currency_map.insert("BTC", 3);
+
+        let test_input = vec![
+            IndexedGraphEdge {
+                start_node: currency_map["EUR"],
+                end_node: currency_map["BTC"],
+                log_conversion_value: -1.0 * (60589.98586103f64).ln(),
+            },
+            IndexedGraphEdge {
+                start_node: currency_map["EUR"],
+                end_node: currency_map["BORG"],
+                log_conversion_value: -1.0 * (0.14846482f64).ln(),
+            },
+            IndexedGraphEdge {
+                start_node: currency_map["BORG"],
+                end_node: currency_map["BTC"],
+                log_conversion_value: -1.0 * (370331.49347896f64).ln(),
+            },
+            IndexedGraphEdge {
+                start_node: currency_map["DAI"],
+                end_node: currency_map["BORG"],
+                log_conversion_value: -1.0 * (0.16276449f64).ln(),
+            },
+            IndexedGraphEdge {
+                start_node: currency_map["DAI"],
+                end_node: currency_map["BTC"],
+                log_conversion_value: -1.0 * (61194.73626107f64).ln(),
+            },
+            IndexedGraphEdge {
+                start_node: currency_map["BTC"],
+                end_node: currency_map["DAI"],
+                log_conversion_value: -1.0 * (1.586e-5f64).ln(),
+            },
+            IndexedGraphEdge {
+                start_node: currency_map["DAI"],
+                end_node: currency_map["EUR"],
+                log_conversion_value: -1.0 * (1.10578631f64).ln(),
+            },
+            IndexedGraphEdge {
+                start_node: currency_map["BORG"],
+                end_node: currency_map["EUR"],
+                log_conversion_value: -1.0 * (6.5350502f64).ln(),
+            },
+            IndexedGraphEdge {
+                start_node: currency_map["BTC"],
+                end_node: currency_map["BORG"],
+                log_conversion_value: -1.0 * (2.69e-6f64).ln(),
+            },
+            IndexedGraphEdge {
+                start_node: currency_map["EUR"],
+                end_node: currency_map["DAI"],
+                log_conversion_value: -1.0 * (0.89846283f64).ln(),
+            },
+            IndexedGraphEdge {
+                start_node: currency_map["BTC"],
+                end_node: currency_map["EUR"],
+                log_conversion_value: -1.0 * (1.739e-5f64).ln(),
+            },
+            IndexedGraphEdge {
+                start_node: currency_map["BORG"],
+                end_node: currency_map["DAI"],
+                log_conversion_value: -1.0 * (1.739e-5f64).ln(),
+            },
+        ];
+
+        let test_bellman_ford = Graph::new(test_input, currency_map.len());
+        test_bellman_ford.search_for_arbitrage(0);
+    }
 }
