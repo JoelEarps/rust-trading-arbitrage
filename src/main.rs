@@ -1,3 +1,5 @@
+use std::sync::{Arc, RwLock};
+
 use log::info;
 use reqwest::Error;
 mod data_processing;
@@ -11,7 +13,7 @@ use tokio::task;
 
 /* POA:
 1. Bubble up custom errors
-2. Configurable BE address
+2. Configurable BE address and thread request time
     a. Loop errors
 3. Tokio multi loop
 4. Binary search algorithm for live graph
@@ -32,11 +34,19 @@ async fn fetch_rates_periodically(){
     }
     
 }
+
+async fn re_calculate_values(){
+    // Check for change in values, this is where maybe you could do a sorting and checking alogrithm
+
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     env_logger::init();
     info!("Staring arbitrage application");
+    let shared_response_data = Arc::new(RwLock::new(0));
     let fetch_handle = task::spawn(fetch_rates_periodically());
+    
 
     // Wait for both tasks to complete
     // Create custom error and handle
