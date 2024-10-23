@@ -26,6 +26,10 @@ impl Graph {
             total_vertices: calculated_total_vertices,
         }
     }
+
+    fn validate_results(){}
+
+    fn pretty_print_results(){}
 }
 
 pub trait SearchAllEdgesAlgorithm {
