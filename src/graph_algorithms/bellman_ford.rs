@@ -27,6 +27,7 @@ impl SearchAllEdgesAlgorithm for Graph {
             }
         }
 
+        // https://www.thealgorists.com/Algo/ShortestPaths/OptimizedBellmanFord
         for edge in &self.edges {
             if distances[edge.start_node] != f64::INFINITY
                 && distances[edge.start_node] + edge.log_conversion_value < distances[edge.end_node]

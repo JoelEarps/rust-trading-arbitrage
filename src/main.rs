@@ -9,6 +9,8 @@ mod fetch_rates;
 use fetch_rates::{fetch_rates_periodically, RatesResponse};
 use tokio::task;
 use anyhow::Result;
+mod errors;
+use errors::fetching_rates_errors::HandlerErrors;
 
 
 /* POA:
@@ -31,7 +33,7 @@ More than x amount times, stop application
  */
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> Result<(), HandlerErrors> {
     env_logger::init();
     info!("Staring arbitrage application");
     let shared_response_data: Arc<RwLock<RatesResponse>> = Arc::new(RwLock::new(RatesResponse{rates: HashMap::new()}));

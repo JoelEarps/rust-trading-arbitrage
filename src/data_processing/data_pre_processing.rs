@@ -29,6 +29,7 @@ pub(crate) fn pre_process_request_data(
                 none_indexed_graph_edges.push(NoneIndexedGraphEdge {
                     start_node: split_key[0].to_string(),
                     end_node: split_key[1].to_string(),
+                    // Bubble up custom errors?
                     conversion_rate: value.parse::<f64>().expect("Cannot parse conversion rate"),
                 });
                 true
