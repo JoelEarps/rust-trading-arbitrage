@@ -10,7 +10,7 @@
 1. Application must be able to make an API call to https://api.swissborg.io/v1/challenge/rates to access latest rates (updated every 10 seconds).
 2. Discovers arbitrage opportunities to provide user with most profitable route.
 
-## Non Functional (what is the problem)
+## Non Functional
 
 1. Reusable Algorithm for scalability - allow for multi threaded and live updates in the future.
 2. Testable - unit tests provided for some functionality.
