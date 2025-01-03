@@ -10,9 +10,6 @@ use anyhow::Result;
 mod errors;
 
 #[tokio::main]
-/* Using an Anyhow Result allows
-
-Anyhow Errors - why and what do they do?*/
 async fn main() -> Result<()> {
     env_logger::init();
     info!("Staring arbitrage application");

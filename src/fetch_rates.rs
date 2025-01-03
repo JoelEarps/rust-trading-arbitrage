@@ -16,7 +16,6 @@ pub async fn fetch_rates_periodically(shared_response_data: Arc<RwLock<RatesResp
         info!("Successfully pulled rates, {:#?}", rates_response);
         tokio::time::sleep(tokio::time::Duration::from_secs(10)).await;
         if let Ok(mut return_data) = shared_response_data.try_write() {
-        // Implement Binary Search for updated rates here? Custom error for failure to assign?
         return_data.rates = rates_response.rates;
         info!("Now the number is {:?}", return_data.rates);
         attempt_counter = 0;
