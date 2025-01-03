@@ -1,3 +1,7 @@
+## Current Issue
+
+The current issue is that the thread for calculating results occurs quicker than fetching, ideally we need to re run the values everytime new data is pulled, therefore creating a new thread. This can be investigated in the future.
+
 # Pre-requisites
 
 1. Cargo and rust toolchain.

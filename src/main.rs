@@ -10,9 +10,9 @@ use anyhow::Result;
 mod errors;
 
 #[tokio::main]
-// Result here using conventional method for demonstration
-// Threading Errors are handled using anyhow, JoinError here only has one context, that the Task failed to execute, here I am happy to fail the error and use anyhow utilities to convert
-// The errors safely, thus failing the program
+/* Using an Anyhow Result allows
+
+Anyhow Errors - why and what do they do?*/
 async fn main() -> Result<()> {
     env_logger::init();
     info!("Staring arbitrage application");
