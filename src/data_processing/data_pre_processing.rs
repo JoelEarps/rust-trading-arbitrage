@@ -1,6 +1,7 @@
-use crate::graph_algorithms::handler::{IndexedGraphEdge, NoneIndexedGraphEdge};
+use crate::{errors::data_processing_errors::DataProcessingErrors, graph_algorithms::handler::{IndexedGraphEdge, NoneIndexedGraphEdge}};
 use log::{info, trace, warn};
 use std::collections::HashMap;
+use crate::errors::data_processing_errors::DataPreProcessingResult;
 
 pub struct RequiredGraphData {
     pub graph_edges: Vec<IndexedGraphEdge>,
@@ -9,11 +10,14 @@ pub struct RequiredGraphData {
 
 pub(crate) fn pre_process_request_data(
     raw_rates: &mut HashMap<String, String>,
-) -> RequiredGraphData {
+) -> DataPreProcessingResult<RequiredGraphData> {
     info!("Removing duplicate tickers to ensure clean node map");
     let mut none_indexed_graph_edges = Vec::new();
     let mut currency_index_store: HashMap<String, usize> = HashMap::new();
     let mut total_graph_vertices_number = 0;
+
+    let mut errors_found_during_pre_processing: Vec<DataProcessingErrors> = Vec::new();
+
     raw_rates.retain(|key, value| {
         let mut split_key: Vec<&str> = key.split("-").collect();
         split_key.dedup();
@@ -26,23 +30,50 @@ pub(crate) fn pre_process_request_data(
             }
             2 => {
                 trace!("Valid pairing found");
-                none_indexed_graph_edges.push(NoneIndexedGraphEdge {
-                    start_node: split_key[0].to_string(),
-                    end_node: split_key[1].to_string(),
-                    // Bubble up custom errors?
-                    conversion_rate: value.parse::<f64>().expect("Cannot parse conversion rate"),
-                });
+                let conversion_rate_as_float =  value
+                .parse::<f64>();
+
+                match conversion_rate_as_float {
+                    Ok(converted_value) => {
+                        none_indexed_graph_edges.push(NoneIndexedGraphEdge {
+                            start_node: split_key[0].to_string(),
+                            end_node: split_key[1].to_string(),
+                            // Bubble up custom errors?
+                            // Data pre processing error
+                            conversion_rate: converted_value
+                        });
+                    },
+                    Err(err) => errors_found_during_pre_processing.push(DataProcessingErrors::ParsingError(value.to_string())),
+                }
                 true
             }
             _ => {
+                errors_found_during_pre_processing.push(DataProcessingErrors::InvalidGraphPair(key.to_string()));
                 warn!("Invalid input");
                 false
             }
         }
     });
-    // add error here for no values in index store and data contract changing!
+
+    
+    
     info!("{:?}", currency_index_store);
-    create_indexing_for_currencies(none_indexed_graph_edges, currency_index_store)
+    
+    if currency_index_store.len() < 1 {
+        return Err(DataProcessingErrors::NoValidIndexingData);
+    }
+
+    match errors_found_during_pre_processing.len() {
+        0 => {
+            Ok(create_indexing_for_currencies(none_indexed_graph_edges, currency_index_store))
+        },
+        1 => {
+            Err(errors_found_during_pre_processing[0].clone().into())
+        },  
+        _ => {
+            Err(DataProcessingErrors::MultiErrorDump(errors_found_during_pre_processing))
+        }
+    }
 }
 
 fn create_indexing_for_currencies(
@@ -91,7 +122,7 @@ mod tests {
 
         assert_eq!(exchange_rates.len(), 16);
         let test_vector_return = pre_process_request_data(&mut exchange_rates);
-        assert_eq!(test_vector_return.graph_vertices_total, 4);
+        assert_eq!(test_vector_return.unwrap().graph_vertices_total, 4);
         assert_eq!(exchange_rates.len(), 12);
     }
 
@@ -115,7 +146,7 @@ mod tests {
 
         assert_eq!(exchange_rates.len(), 12);
         let test_vector_return = pre_process_request_data(&mut exchange_rates);
-        assert_eq!(test_vector_return.graph_vertices_total, 0);
+        assert_eq!(test_vector_return.unwrap().graph_vertices_total, 0);
         assert_eq!(exchange_rates.len(), 12);
     }
 
@@ -130,8 +161,9 @@ mod tests {
 
         assert_eq!(exchange_rates.len(), 4);
         let test_vector_return = pre_process_request_data(&mut exchange_rates);
-        assert_eq!(test_vector_return.graph_vertices_total, 4);
-        assert_eq!(test_vector_return.graph_edges.len(), 0);
+        let test_data_to_be_asserted_on = test_vector_return.unwrap();
+        assert_eq!(test_data_to_be_asserted_on.graph_vertices_total, 4);
+        assert_eq!(test_data_to_be_asserted_on.graph_edges.len(), 0);
         assert_eq!(exchange_rates.len(), 0);
     }
 
@@ -145,8 +177,9 @@ mod tests {
         exchange_rates.insert("Test4".to_string(), "370331.49347896".to_string());
         assert_eq!(exchange_rates.len(), 4);
         let test_vector_return = pre_process_request_data(&mut exchange_rates);
-        assert_eq!(test_vector_return.graph_vertices_total, 4);
-        assert_eq!(test_vector_return.graph_edges.len(), 0);
+        let test_data_to_be_asserted_on = test_vector_return.unwrap();
+        assert_eq!(test_data_to_be_asserted_on.graph_vertices_total, 4);
+        assert_eq!(test_data_to_be_asserted_on.graph_edges.len(), 0);
         assert_eq!(exchange_rates.len(), 0);
     }
 }

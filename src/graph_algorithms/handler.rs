@@ -1,8 +1,10 @@
 use log::{info, error};
-use std::sync::{Arc, RwLock};
+use std::{borrow::Borrow, sync::{Arc, RwLock, TryLockError}};
 use anyhow::Result;
+use anyhow::anyhow;
 
-use crate::fetch_rates::RatesResponse;
+
+use crate::{data_processing::data_pre_processing::pre_process_request_data, errors::data_processing_errors::DataPreProcessingResult, fetch_rates::RatesResponse};
 
 #[derive(Clone, Copy, Debug)]
 pub struct IndexedGraphEdge {
@@ -32,24 +34,31 @@ impl Graph {
     }
 
     pub async fn re_calculate_values(shared_response_data: Arc<RwLock<RatesResponse>>) -> Result<()>{
-    // Check for change in values, this is where maybe you could do a sorting and checking alogrithm
     match shared_response_data.try_read() {
         Ok(data) => {
             info!("Data read successfully, {:?}", data);
+            let mut latest_rates = data.rates.clone();
+            let graph_data = pre_process_request_data(&mut latest_rates)?;
+            let bellman_ford_graph = Graph::new(graph_data.graph_edges, graph_data.graph_vertices_total);
+            info!("Checking for the shortest path for each vertex");
+            bellman_ford_graph.search_for_arbitrage(0);
             Ok(())
         }
-        Err(_) => {
-            error!("Could not return data, adding to failure list and then bubbling up error via custom at some point");
-            Ok(())
+        Err(err) => {
+            error!("Failed to access Data in via Mutex");
+            match err {
+                TryLockError::WouldBlock => {
+                    error!("Failed to access data: lock would block");
+                    return Err(anyhow!("Failed to access data: lock would block"));
+                }
+                TryLockError::Poisoned(_) => {
+                    error!("Failed to access data: lock is poisoned");
+                    return Err(anyhow!("Failed to access data: lock is poisoned"));
+                }
+            }
         }
      }
     }
-
-    fn search_for_rate_changes() {}
-
-    fn validate_results(){}
-
-    fn pretty_print_results(){}
 }
 
 pub trait SearchAllEdgesAlgorithm {

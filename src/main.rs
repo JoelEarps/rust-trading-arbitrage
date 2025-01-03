@@ -1,35 +1,13 @@
 use std::{collections::HashMap, sync::{Arc, RwLock}};
-use log::{info, error};
-use reqwest::Error;
+use log::info;
 mod data_processing;
 mod graph_algorithms;
-use data_processing::data_pre_processing::pre_process_request_data;
-use graph_algorithms::handler::{Graph, SearchAllEdgesAlgorithm};
+use graph_algorithms::handler::Graph;
 mod fetch_rates;
 use fetch_rates::{fetch_rates_periodically, RatesResponse};
 use tokio::task;
 use anyhow::Result;
 mod errors;
-
-
-/* POA:
-1. Bubble up custom errors
-2. Configurable BE address and thread request time
-    a. Loop errors
-3. Tokio multi loop
-4. Binary search algorithm for live graph
-5. Graceful shutdown
-*/
-
-// Add a config value that passes this periodically
-// Create Arc that shares data
-
-// Error that require bubbling up and kill application
-/*
-1. Writing/ Reading from Mutexes fails
-2. Tasks joining errors and seeing if any thread finished properly or all failed - if we fail to calculate/ pull data
-More than x amount times, stop application
- */
 
 #[tokio::main]
 // Result here using conventional method for demonstration
